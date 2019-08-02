@@ -22,11 +22,11 @@ class Player_Lists:
                 return player
         return None
 
-    def find_nofpl_players(self):
-        no_fpl_players = []
+    def find_nounderstat_players(self):
+        no_understat_players = []
         for player in self._full_list:
-            if player.get_fpl_value() == 0 or player.get_fpl_position() == 0:
-                no_fpl_players.append(player)
+            if player.get_goals_18() == None:
+                no_understat_players.append(player)
                 print(player,'\n')
-        print (len(no_fpl_players))
-        return no_fpl_players
+        print(len(no_understat_players))
+        return no_understat_players
