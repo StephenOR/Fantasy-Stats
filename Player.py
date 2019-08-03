@@ -1,7 +1,10 @@
 class Player:
 
-    def __init__(self,name, team, fpl_value, fpl_points, fpl_position, understat_ID = None,goals_18 = None,assists_18 = None,xG_18 = None,xA_18 = None,NPxG_18 = None,mins_18 = None,apps_18 = None,yellows_18 = None,reds_18 = None):
+    def __init__(self,name, fpl_first_name, fpl_second_name, fpl_web_name, team, fpl_value, fpl_points, fpl_position, understat_ID = None,goals_18 = None,assists_18 = None,xG_18 = None,xA_18 = None,NPxG_18 = None,mins_18 = None,apps_18 = None,yellows_18 = None,reds_18 = None):
         self._name = name
+        self._fpl_first_name = fpl_first_name
+        self._fpl_second_name = fpl_second_name
+        self._fpl_web_name = fpl_web_name
         self._team = team
         self._fpl_value = fpl_value
         self._fpl_points = fpl_points
@@ -41,6 +44,24 @@ class Player:
 
     def set_name(self,name):
         self._name = name
+
+    def get_fpl_first_name(self):
+        return self._fpl_first_name
+
+    def set_fpl_first_name(self,fpl_first_name):
+        self._fpl_first_name = fpl_first_name
+
+    def get_fpl_second_name(self):
+        return self._fpl_second_name
+
+    def set_fpl_second_name(self,second_name):
+        self._fpl_second_name = second_name
+
+    def get_fpl_web_name(self):
+        return self._fpl_web_name
+
+    def set_fpl_web_name(self,fpl_web_name):
+        self._fpl_web_name = fpl_web_name
 
     def get_team(self):
         return self._team
