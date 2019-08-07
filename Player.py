@@ -147,6 +147,43 @@ class Player:
     def set_fpl_points(self,points):
         self._fpl_points = points
 
+    def get_per90_xG(self):
+        xG = self.get_xG_18() * 90
+        xG = xG / self._mins_18()
+        return xG
+
+    def get_per90_NPxG(self):
+        NPxG = self.get_NPxG_18() * 90
+        NPxG = NPxG / self.get_mins_18()
+        return NPxG
+
+    def get_per90_xA(self):
+        xA = self.get_xA_18() * 90
+        xA = xA / self.get_mins_18()
+        return xA
+
+    def NPxP_per_90(self):
+        player_position = self.get_fpl_position()
+        player_xp = 0
+        if player_position == 1:
+            return 0
+        elif player_position == 2:
+            player_xp += self.get_per90_NPxG() * 6
+            player_xp += self.get_per90_xA() * 3
+        elif player_position == 3:
+            player_xp += self.get_per90_NPxG() * 5
+            player_xp += self.get_per90_xA() * 3
+        else:
+            player_xp += self.get_per90_NPxG() * 4
+            player_xp += self.get_per90_xA() * 3
+        return player_xp
+
+    def get_NPxP_to_value(self):
+        player_NPxP_p90 = self.NPxP_per_90()
+        NPxP_val = player_NPxP_p90 / player.get_fpl_value()
+        return NPxP_val
+
+
     def add_understat_values(self,id,goals_18,assists_18,xG_18,xA_18,NPxG_18,mins_18,apps_18,yellows_18,reds_18):
         self.set_understat_ID(id)
         self.set_goals_18(goals_18)

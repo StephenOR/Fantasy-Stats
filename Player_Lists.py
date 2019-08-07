@@ -45,7 +45,7 @@ class Player_Lists:
         newly_promoted_clubs = ["Norwich City", "Sheffield United", "Aston Villa"]
         no_stat_players = []
         for player in self._full_list:
-            if player.get_goals_18() == -1 and player.get_team() not in newly_promoted_clubs:
+            if player.get_goals_18() == -1:
                 no_stat_players.append(player)
                 print(player)
         print(len(no_stat_players))

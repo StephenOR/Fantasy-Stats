@@ -34,18 +34,17 @@ async def get_solo_player_data(understat_name, league):
 def get_fpl_list_of_players():
     list_of_players = Player_Lists()
     fpl_list = fpl_scraper.get_fantasy_data()
-    newly_promoted_clubs = ["Norwich City", "Sheffield United", "Aston Villa"]
     for fpl_player in fpl_list:
         fpl_player_name = fpl_player.get('web_name')
         if fpl_player.get('first_name') != fpl_player.get('web_name'):
             fpl_player_name = fpl_player.get('first_name') + ' ' + fpl_player.get('second_name')
-            player_team = club_mapper(fpl_player.get('team'))
-            if fpl_player.get('total_points') == 0:
-                P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
-                 player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'),-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
-            else:
-                P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
-                 player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'))
+        player_team = club_mapper(fpl_player.get('team'))
+        if fpl_player.get('total_points') == 0:
+            P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
+                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'),-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+        else:
+            P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
+                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'))
         list_of_players.add_to_full_list(P)
     return list_of_players
 
@@ -65,7 +64,8 @@ def get_transfered_player_data(player_list):
     transfered_players = {'Tanguy Ndombele' : ('Tanguy NDombele Alvaro', 'Ligue_1'), 'Rodri' : ('Rodri', 'La_Liga'), 'Nicolas Pépé' : ('Nicolas Pepe', 'Ligue_1'),
     'Daniel Ceballos Fernández' : ('Dani Ceballos', 'La_Liga'), 'Reiss Nelson' : ('Reiss Nelson', 'Bundesliga'), 'Erik Pieters' : ('Erik Pieters', 'Ligue_1'), 'Christian Pulisic' : ('Christian Pulisic', 'Bundesliga'),
     'Joelinton Cássio Apolinário de Lira' : ('Joelinton', 'Bundesliga'), 'Pablo Fornals' : ('Pablo Fornals', 'La_Liga'), 'Sébastien Haller' : ('Sébastien Haller', 'Bundesliga'), 'Jesús Vallejo Lázaro' : ('Jesús Vallejo', 'La_Liga'),
-    'Patrick Cutrone' : ('Patrick Cutrone', 'Serie_A')}
+    'Patrick Cutrone' : ('Patrick Cutrone', 'Serie_A'), 'Moise Kean' : ('Moise Kean', 'Serie_A'), 'Allan Saint-Maximin' : ('Allan Saint-Maximin', 'Ligue_1'),  'Bjorn Engels' : ('Björn Engels', 'Ligue_1'),
+    'Josip Drmic' : ('Josip Drmic', 'Bundesliga'), 'Ralf Fahrmann' : ('Ralf Fährmann', 'Bundesliga'), }
     #In the form of fpl name : Understat name, league name
     loop = asyncio.get_event_loop()
     for player in transfered_players:
@@ -84,5 +84,24 @@ def club_mapper(club_id):
     return club_dict[club_id]
 
 
+#Stats Analysis here onwards
+
+
+def xPCalculator(list_of_players):
+    output = []
+    for player in list_of_players.get_full_list():
+        output += (player.get_name(), player.NPxP_per_90())
+    for i in output:
+        print(i, '\n')
+
+def xPToValueCaluclator(list_of_players):
+    output = []
+    for player in list_of_players.get_full_list():
+        output += (player.get_name(), player.xPToValueCaluclator())
+    for i in output:
+        print(i , '\n')
+
+
+
 a = get_all_player_data()
-a.find_no_stat_players()
+xPCalculator(a)
