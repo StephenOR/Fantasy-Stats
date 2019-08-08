@@ -41,10 +41,10 @@ def get_fpl_list_of_players():
         player_team = club_mapper(fpl_player.get('team'))
         if fpl_player.get('total_points') == 0:
             P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
-                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'),-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
+                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'),fpl_player.get('clean_sheets'),fpl_player.get('bps'),-1,-1,-1,-1,-1,-1,-1,-1,-1,-1)
         else:
             P = Player(fpl_player_name, fpl_player.get('first_name'), fpl_player.get('second_name'), fpl_player.get('web_name'),
-                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'))
+                player_team, fpl_player.get('now_cost'), fpl_player.get('total_points'), fpl_player.get('element_type'), fpl_player.get('clean_sheets'), fpl_player.get('bps'))
         list_of_players.add_to_full_list(P)
     return list_of_players
 
@@ -101,7 +101,13 @@ def xPToValueCaluclator(list_of_players):
     for i in output:
         print(i , '\n')
 
-
+def poisson(list_of_players):
+    output = []
+    for player in list_of_players.get_full_list():
+        output += (player.get_name(), player.poisson_per_90())
+    for i in output:
+        print(i , '\n')
 
 a = get_all_player_data()
-xPCalculator(a)
+for b in a.get_full_list():
+    print(b)
