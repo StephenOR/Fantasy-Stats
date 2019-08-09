@@ -1,7 +1,6 @@
-import math
 class Player:
 
-    def __init__(self,name, fpl_first_name, fpl_second_name, fpl_web_name, team, fpl_value, fpl_points, fpl_position, fpl_clean_sheets, fpl_bps, understat_ID = None,goals_18 = None,assists_18 = None,xG_18 = None,xA_18 = None,XGI_18 = None,NPxG90 = None,xA90 = None,xG90 = None,xGI90 = None,NPxGI90 = None,NPxG_18 = None,mins_18 = None,apps_18 = None,yellows_18 = None,reds_18 = None,penalty_taker_chance = None):
+    def __init__(self,name, fpl_first_name, fpl_second_name, fpl_web_name, team, fpl_value, fpl_points, fpl_position, fpl_clean_sheets, fpl_bps, understat_ID = None,goals_18 = None,assists_18 = None,xG_18 = None,xA_18 = None,XGI_18 = None,NPxG90 = None,xA90 = None,xG90 = None,xGI90 = None,NPxGI90 = None,NPxG_18 = None,mins_18 = None,apps_18 = None,yellows_18 = None,reds_18 = None,penalty_taker_chance = 0):
         self._name = name
         self._fpl_first_name = fpl_first_name
         self._fpl_second_name = fpl_second_name
@@ -32,7 +31,7 @@ class Player:
 
     def __str__(self):
         output_str = "Name: %s\n" %self.get_name()
-        output_str += "Team: %s\n" %self.get_team()
+        output_str += "Team: %s\n" %self.get_team().get_name()
         output_str += "FPL Value: %i\n" %self.get_fpl_value()
         output_str += "FPL Points: %i\n" %self.get_fpl_points()
         output_str += "FPL Position: %i\n" %self.get_fpl_position()
@@ -56,6 +55,8 @@ class Player:
             output_str += "Expected Assists per 90 %f\n" %self._xA90
             output_str += "Expected goal involvments per 90 %f\n" %self._xGI90
             output_str += "Non-Pen expected goal invovlements per 90 %f\n" %self._NPxGI90
+            if self.get_penalty_taker_chance() > 0:
+                output_str += "Penalty taker chance: %f\n" %self._penalty_taker_chance
         return output_str
 
 
@@ -189,11 +190,11 @@ class Player:
     def set_XGI_18(self):
         self._XGI_18 = self.get_xG_18() + self.get_xA_18()
 
-    # def get_NPxP_per_90(self):
-    #     return self._NPxP_90
-    #
-    # def set_NPxP_per_90(self,NPxP_p90):
-    #     self._NPxP_90 = float(NPxP_p90)
+    def get_penalty_taker_chance(self):
+        return self._penalty_taker_chance
+
+    def set_penalty_taker_chance(self,chance):
+        self._penalty_taker_chance = chance
 
     def get_NPxG90(self):
         return self._NPxG90
@@ -224,27 +225,41 @@ class Player:
 
     def set_NPxGI90(self):
         self._NPxGI90 = float(self.get_NPxG90() + self.get_xA90())
-    #
-    # def NPxP_per_90_calculator(self):
-    #     player_position = self.get_fpl_position()
-    #     player_xp = 0
-    #     if player_position == 1:
-    #         return 0
-    #     elif player_position == 2:
-    #         player_xp += self.get_per90_NPxG() * 6
-    #         player_xp += self.get_per90_xA() * 3
-    #     elif player_position == 3:
-    #         player_xp += self.get_per90_NPxG() * 5
-    #         player_xp += self.get_per90_xA() * 3
-    #     else:
-    #         player_xp += self.get_per90_NPxG() * 4
-    #         player_xp += self.get_per90_xA() * 3
-    #     return player_xp
-    #
-    # def get_NPxP_to_value_calculator(self):
-    #     player_NPxP_p90 = self.NPxP_per_90()
-    #     NPxP_val = player_NPxP_p90 / player.get_fpl_value()
-    #     return NPxP_val
+
+    def NPxP_per_90_calculator(self):
+        player_position = self.get_fpl_position()
+        player_xp = 2
+        team = self.get_team()
+        poisson_per_90 = team.poisson_per_90()
+        pen_taker = False
+        if self.get_penalty_taker_chance() > 0:
+            pen_taker = True
+        if player_position == 1:
+            #Poisson is for cleansheets
+            player_xp += poisson_per_90[0]
+        elif player_position == 2:
+            player_xp += poisson_per_90[0]
+            player_xp += self.get_NPxG90() * 6
+            player_xp += self.get_xA90() * 3
+            if pen_taker:
+                player_xp += .4 * self.get_penalty_taker_chance()
+        elif player_position == 3:
+            player_xp += poisson_per_90[1]
+            player_xp += self.get_NPxG90() * 5
+            player_xp += self.get_xA90() * 3
+            if pen_taker:
+                player_xp += .325 * self.get_penalty_taker_chance()
+        else:
+            player_xp += self.get_NPxG90() * 4
+            player_xp += self.get_xA90() * 3
+            if pen_taker:
+                player_xp += .25 * self.get_penalty_taker_chance()
+        return player_xp
+
+    def get_NPxP_to_value_calculator(self):
+        player_NPxP_p90 = self.NPxP_per_90()
+        NPxP_val = player_NPxP_p90 / player.get_fpl_value()
+        return NPxP_val
 
     def bonus_score_expected_difference(self):
         player_position = self.get_fpl_position()
@@ -255,27 +270,6 @@ class Player:
         if player_position == 1:
             player_expected_bps = 12*(38*euler_to_minus_lambda-player_clean_sheets)+player_bps
 
-
-    def poisson_per_90(self):
-        player_position = self.get_fpl_position()
-        player_poisson = 0
-        team_xGA_per_90 = ...
-        k=2
-        euler_to_minus_lambda = math.exp(0-team_xGA_per_90)
-        if player_position == 1 or 2:
-            player_poisson = 4*euler_to_minus_lambda
-            while k<4:
-                player_poisson-=((euler_to_minus_lambda)*(team_xGA_per_90**k))/math.factorial(k)
-                k+=1
-            while k<6:
-                player_poisson-=2*((euler_to_minus_lambda)*(team_xGA_per_90**k))/math.factorial(k)
-                k+=1
-            while k<8:
-                player_poisson-=3*((euler_to_minus_lambda)*(team_xGA_per_90**k))/math.factorial(k)
-                k+=1
-        elif player_position == 3:
-            player_poisson = euler_to_minus_lambda
-        print(player_poisson)
 
     def add_understat_values(self,id,goals_18,assists_18,xG_18,xA_18,NPxG_18,mins_18,apps_18,yellows_18,reds_18):
         self.set_understat_ID(id)
@@ -295,10 +289,12 @@ class Player:
         self.set_xGI90()
         self.set_NPxGI90()
 
+
+
 def main():
     eh = Player("Eden", 110, 111, 112, 113, 114, 115, 116, 117, 118, 119)
     eh.set_fpl_position(2)
-    eh.poisson_per_90()
+    eh.NPxP_per_90_calculator()
 
 if __name__ == "__main__":
     main()
